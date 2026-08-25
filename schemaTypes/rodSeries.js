@@ -37,7 +37,15 @@ export default {
     {
       name: 'heroImage',
       type: 'image',
-      title: 'Series Photo',
+      title: 'Hero Image',
+      description: 'Full-width banner shown at the top of this series\' landing page (/shop/rods/[slug]).',
+      options: {hotspot: true},
+    },
+    {
+      name: 'previewImage',
+      type: 'image',
+      title: 'Card Preview Image',
+      description: 'Isolated rod shot used on the In-Stock Rods hub grid card. Should be a clean, transparent/light-background product photo — not the hero banner.',
       options: {hotspot: true},
     },
     {
@@ -54,6 +62,6 @@ export default {
     },
   ],
   preview: {
-    select: {title: 'name', subtitle: 'slug', media: 'heroImage'},
+    select: {title: 'name', subtitle: 'slug', media: 'previewImage'},
   },
 }

@@ -20,63 +20,71 @@ export default {
     },
 
     // ─── 1. HERO ───────────────────────────────────────────────
+   // ─── 1. HERO ───────────────────────────────────────────────
+{
+  name: 'hero',
+  type: 'object',
+  title: 'Hero',
+  group: 'hero',
+  fields: [
     {
-      name: 'hero',
+      name: 'headline',
+      type: 'string',
+      title: 'Headline',
+      initialValue: 'Handcrafted Custom Fishing Rods',
+    },
+    {
+      name: 'subheadline',
+      type: 'string',
+      title: 'Subheadline',
+      initialValue: 'Your passion meets our craftsmanship.',
+    },
+    {
+      name: 'backgroundImage',
+      type: 'image',
+      title: 'Hero Background Image',
+      description: 'Full-width background — water/lifestyle scene',
+      options: {hotspot: true},
+    },
+    {
+      name: 'rodImage',
+      type: 'image',
+      title: 'Hero Rod Image',
+      description: 'Foreground rod product shot layered over the background',
+      options: {hotspot: true},
+    },
+    {
+      name: 'ctaPrimary',
       type: 'object',
-      title: 'Hero',
-      group: 'hero',
+      title: 'CTA 1 — Custom Rod Builder',
       fields: [
+        {name: 'label', type: 'string', title: 'Label', initialValue: 'Build Your Custom Rod'},
         {
-          name: 'headline',
+          name: 'url',
           type: 'string',
-          title: 'Headline',
-          initialValue: 'Handcrafted Custom Fishing Rods',
-        },
-        {
-          name: 'subheadline',
-          type: 'string',
-          title: 'Subheadline',
-          initialValue: 'Your passion meets our craftsmanship.',
-        },
-        {
-          name: 'image',
-          type: 'image',
-          title: 'Hero Image',
-          description: 'Lifestyle or on-the-water rod photography',
-          options: {hotspot: true},
-        },
-        {
-          name: 'ctaPrimary',
-          type: 'object',
-          title: 'CTA 1 — Custom Rod Builder',
-          fields: [
-            {name: 'label', type: 'string', title: 'Label', initialValue: 'Build Your Custom Rod'},
-            {
-              name: 'url',
-              type: 'string',
-              title: 'URL',
-              description: 'Fixed destination — read-only in practice',
-              initialValue: '/shop/custom',
-            },
-          ],
-        },
-        {
-          name: 'ctaSecondary',
-          type: 'object',
-          title: 'CTA 2 — In-Stock Rods',
-          fields: [
-            {name: 'label', type: 'string', title: 'Label', initialValue: 'Shop In-Stock Rods'},
-            {
-              name: 'url',
-              type: 'string',
-              title: 'URL',
-              description: 'Fixed destination — read-only in practice',
-              initialValue: '/shop/rods',
-            },
-          ],
+          title: 'URL',
+          description: 'Fixed destination — read-only in practice',
+          initialValue: '/shop/custom',
         },
       ],
     },
+    {
+      name: 'ctaSecondary',
+      type: 'object',
+      title: 'CTA 2 — In-Stock Rods',
+      fields: [
+        {name: 'label', type: 'string', title: 'Label', initialValue: 'Shop In-Stock Rods'},
+        {
+          name: 'url',
+          type: 'string',
+          title: 'URL',
+          description: 'Fixed destination — read-only in practice',
+          initialValue: '/shop/rods',
+        },
+      ],
+    },
+  ],
+},
 
     // ─── 2. FEATURED PRODUCT ────────────────────────────────────
     {
