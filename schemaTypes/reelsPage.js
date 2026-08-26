@@ -42,6 +42,16 @@ export default {
       ],
     },
 
+    // ─── 2. PRODUCT GRID SECTION ───────────────────────────────
+    // Heading shown directly above the Shopify-driven product grid.
+    {
+      name: 'gridHeading',
+      type: 'string',
+      title: 'Product Grid Heading',
+      group: 'hero',
+      initialValue: 'Shop Reels',
+    },
+
     ...seoField,
   ],
 

@@ -17,6 +17,21 @@ export default {
       title: 'Page Title',
       initialValue: 'In-Stock Rods',
     },
+    {
+      name: 'season',
+      type: 'string',
+      title: 'Current Season',
+      description:
+        'Controls which filter is shown/selected first on page load — switch this seasonally as ice/open-water fishing comes into or out of season.',
+      options: {
+        list: [
+          {title: 'Open Water', value: 'open-water'},
+          {title: 'Ice Fishing', value: 'ice'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'open-water',
+    },
 
     // ─── 1. HERO ───────────────────────────────────────────────
     {
@@ -58,7 +73,12 @@ export default {
           type: 'object',
           title: 'CTA 2 — Jump to Full Grid',
           fields: [
-            {name: 'label', type: 'string', title: 'Label', initialValue: 'Explore All In-Stock Rods'},
+            {
+              name: 'label',
+              type: 'string',
+              title: 'Label',
+              initialValue: 'Explore All In-Stock Rods',
+            },
             {
               name: 'url',
               type: 'string',
@@ -80,7 +100,12 @@ export default {
       description:
         'Section heading only — series cards and product data are pulled live from Sanity (rodSeries) + Shopify tags.',
       fields: [
-        {name: 'heading', type: 'string', title: 'Heading', initialValue: 'In-Stock Rods by Series'},
+        {
+          name: 'heading',
+          type: 'string',
+          title: 'Heading',
+          initialValue: 'In-Stock Rods by Series',
+        },
         {
           name: 'subheading',
           type: 'string',
@@ -97,7 +122,9 @@ export default {
       title: 'Full Grid Section',
       group: 'fullGrid',
       description: 'Section heading only — the product grid itself is pulled live from Shopify.',
-      fields: [{name: 'heading', type: 'string', title: 'Heading', initialValue: 'Our In-Stock Rods'}],
+      fields: [
+        {name: 'heading', type: 'string', title: 'Heading', initialValue: 'Our In-Stock Rods'},
+      ],
     },
 
     ...seoField,
