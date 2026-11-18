@@ -12,6 +12,10 @@ import testimonial from './testimonial'
 import globalCta from './globalCta'
 import seoSettings from './seoSettings'
 import contactForm from './contactForm'
+import blankColor from './builder/blankColor'
+import threadColor from './builder/threadColor'
+import grip from './builder/grip'
+import application from './builder/application'
 
 export const schemaTypes = [
   navigation,
@@ -28,4 +32,9 @@ export const schemaTypes = [
   globalCta,
   seoSettings,
   contactForm,
+  // Rod builder catalog
+  blankColor,
+  threadColor,
+  grip,
+  application,
 ]

@@ -13,6 +13,8 @@ import {CommentIcon} from '@sanity/icons/Comment'
 import {TagsIcon} from '@sanity/icons/Tags'
 import {StarIcon} from '@sanity/icons/Star'
 import {LaunchIcon} from '@sanity/icons/Launch'
+import {ColorWheelIcon} from '@sanity/icons/ColorWheel'
+import {CubeIcon} from '@sanity/icons/Cube'
 
 const singletonTypes = [
   'homePage',
@@ -45,9 +47,66 @@ export const structure = (S) =>
         .icon(PackageIcon)
         .child(S.document().schemaType('inStockRodsPage').documentId('inStockRodsPage')),
       S.listItem()
-        .title('Custom Rod Builder')
+        .title('Rod Builder')
         .icon(RocketIcon)
-        .child(S.document().schemaType('customBuilderPage').documentId('customBuilderPage')),
+        .child(
+          S.list()
+            .title('Rod Builder')
+            .items([
+              S.listItem()
+                .title('Builder Page')
+                .icon(RocketIcon)
+                .child(
+                  S.document().schemaType('customBuilderPage').documentId('customBuilderPage'),
+                ),
+              S.divider(),
+              S.listItem()
+                .title('Blank Colors')
+                .icon(ColorWheelIcon)
+                .child(
+                  S.documentTypeList('blankColor')
+                    .title('Blank Colors')
+                    .defaultOrdering([{field: 'order', direction: 'asc'}]),
+                ),
+              S.listItem()
+                .title('Thread Colors')
+                .icon(ColorWheelIcon)
+                .child(
+                  S.documentTypeList('threadColor')
+                    .title('Thread Colors')
+                    .defaultOrdering([{field: 'code', direction: 'asc'}]),
+                ),
+              S.listItem()
+                .title('Grips')
+                .icon(CubeIcon)
+                .child(
+                  S.list()
+                    .title('Grips')
+                    .items([
+                      S.listItem()
+                        .title('Ice Grips')
+                        .icon(CubeIcon)
+                        .child(
+                          S.documentList()
+                            .title('Ice Grips')
+                            .schemaType('grip')
+                            .filter('_type == "grip" && waterType == "ice"')
+                            .defaultOrdering([{field: 'order', direction: 'asc'}]),
+                        ),
+                      S.listItem()
+                        .title('Open Water Grips')
+                        .icon(CubeIcon)
+                        .child(
+                          S.documentList()
+                            .title('Open Water Grips')
+                            .schemaType('grip')
+                            .filter('_type == "grip" && waterType == "open-water"')
+                            .defaultOrdering([{field: 'order', direction: 'asc'}]),
+                        ),
+                    ]),
+                ),
+            ]),
+        ),
       S.listItem()
         .title('Reels')
         .icon(TrolleyIcon)
