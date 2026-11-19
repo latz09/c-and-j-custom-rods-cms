@@ -509,6 +509,7 @@ async function createSeries(exportDir, dryRun) {
       applicationType: 'open-water',
       order: nextOrder++,
       builderStatus: 'hidden',
+      inStockStatus: 'hidden',
       builderBlankColors: [{_type: 'reference', _key: 'black', _ref: blankId('Black')}],
       applications,
     }
@@ -571,6 +572,31 @@ async function blurbs(dryRun) {
   }
 }
 
+// ---------- in-stock-status (In-Stock Rods visibility, separate from builderStatus) ----------
+
+const IN_STOCK_STATUS = {
+  'bass-casting': 'hidden',
+  'musky-casting': 'hidden',
+  'musky-spinning': 'hidden',
+  'ice-reaper': 'comingSoon',
+}
+
+async function inStockStatus(dryRun) {
+  const client = await getClient()
+  const docs = await client.fetch(
+    `*[_type == "rodSeries" && !(_id in path("drafts.**"))]{_id, slug, inStockStatus}`,
+  )
+  for (const d of docs) {
+    const value = IN_STOCK_STATUS[d.slug] || 'live'
+    if (d.inStockStatus === value) {
+      console.log(d.slug, value, '(unchanged)')
+      continue
+    }
+    if (!dryRun) await client.patch(d._id).set({inStockStatus: value}).commit()
+    console.log(d.slug, value, dryRun ? '(dry run)' : '(written)')
+  }
+}
+
 // ---------- main ----------
 
 const args = parseArgs(process.argv.slice(2))
@@ -582,7 +608,8 @@ else if (cmd === 'patch-series') await patchSeries(exportDir, args.dryRun)
 else if (cmd === 'pricing') await pricing(exportDir, args.dryRun)
 else if (cmd === 'create-series') await createSeries(exportDir, args.dryRun)
 else if (cmd === 'blurbs') await blurbs(args.dryRun)
+else if (cmd === 'in-stock-status') await inStockStatus(args.dryRun)
 else {
-  console.error('Usage: node scripts/migrate-builder-data.mjs <generate|patch-series|pricing|create-series|blurbs> [--export-dir <dir>] [--dry-run]')
+  console.error('Usage: node scripts/migrate-builder-data.mjs <generate|patch-series|pricing|create-series|blurbs|in-stock-status> [--export-dir <dir>] [--dry-run]')
   process.exit(1)
 }

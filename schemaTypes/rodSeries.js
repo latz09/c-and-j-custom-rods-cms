@@ -32,6 +32,22 @@ export default {
       description: 'Paired with the series tag at query time — e.g. tag:open-water AND tag:panfish-spinning.',
     },
     {
+      name: 'inStockStatus',
+      type: 'string',
+      title: 'In-Stock Rods Status',
+      description:
+        'Controls the In-Stock Rods pages only (separate from Builder Status). Live: card links to the series page. Coming soon: card shows with no link. Hidden: not shown, and the series page returns a 404.',
+      options: {
+        list: [
+          {title: 'Live', value: 'live'},
+          {title: 'Coming soon', value: 'comingSoon'},
+          {title: 'Hidden', value: 'hidden'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'live',
+    },
+    {
       name: 'description',
       type: 'text',
       title: 'Series Description',
