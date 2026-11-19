@@ -70,6 +70,8 @@ const TARGET_BLANKS = {
 }
 const OPEN_WATER_BLANKS = ['Black']
 
+const ICE_REAPER = {slug: "ice-reaper", blanks: ["Black", "Hot Pink", "Neon Green", "Neon Orange"]}
+
 // Old slug -> candidate slugs in the new project (first match wins).
 const SLUG_CANDIDATES = {
   'panfish-carbon': ['carbon-crush', 'panfish-carbon'],
@@ -412,6 +414,22 @@ async function patchSeries(exportDir, dryRun) {
     } else {
       await client.patch(target._id).set(set).commit()
       report.push({series: oldSlug, target: target._id, result: 'patched', status: set.builderStatus})
+    }
+  }
+
+  // Ice Reaper is new (not in the old data): coming soon, with its planned blanks.
+  const reaper = newSeries.find((n) => n.slug === ICE_REAPER.slug)
+  if (!reaper) {
+    report.push({series: ICE_REAPER.slug, result: "SKIPPED, no rodSeries with that slug"})
+  } else {
+    const set = {
+      builderStatus: "comingSoon",
+      builderBlankColors: ICE_REAPER.blanks.map((n) => ({_type: "reference", _key: slugify(n), _ref: blankId(n)})),
+    }
+    if (dryRun) report.push({series: ICE_REAPER.slug, target: reaper._id, builderStatus: set.builderStatus, blanks: ICE_REAPER.blanks})
+    else {
+      await client.patch(reaper._id).set(set).commit()
+      report.push({series: ICE_REAPER.slug, target: reaper._id, result: "patched", status: set.builderStatus})
     }
   }
   console.log(JSON.stringify(report, null, 2))
