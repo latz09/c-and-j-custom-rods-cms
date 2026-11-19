@@ -270,7 +270,11 @@ async function generate(exportDir) {
     for (const [key, material, style] of GRIP_ARRAYS) {
       ;(single[0][key] || []).forEach((item, i) => {
         order += 1
-        const finishName = `${MATERIAL_LABEL[material]} ${STYLE_LABEL[style]} ${i + 1}`
+        // Old descriptions (3 ice cork split grips) become the finish name; the rest are numbered.
+        const desc = item.description?.trim()
+        const finishName = desc
+          ? desc.charAt(0).toUpperCase() + desc.slice(1)
+          : `${MATERIAL_LABEL[material]} ${STYLE_LABEL[style]} ${i + 1}`
         const doc = {
           _id: `grip-${waterType}-${item.referenceId}`,
           _type: 'grip',
