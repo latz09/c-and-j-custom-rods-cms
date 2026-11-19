@@ -466,6 +466,111 @@ async function pricing(exportDir, dryRun) {
   console.log('Pricing Rules written.')
 }
 
+// ---------- create-series (hidden open water series missing from the new project) ----------
+
+const HIDDEN_SERIES = [
+  {oldSlug: 'bass-casting', name: 'Bass Casting'},
+  {oldSlug: 'musky-casting', name: 'Musky Casting'},
+  {oldSlug: 'musky-spinning', name: 'Musky Spinning'},
+]
+
+async function createSeries(exportDir, dryRun) {
+  const old = readOldDocs(exportDir)
+  const client = await getClient()
+  const existing = await client.fetch(
+    `*[_type == "rodSeries" && !(_id in path("drafts.**"))]{_id, slug, applicationType, order}`,
+  )
+  // Existing series have no order values yet, so park the hidden ones at 101+ to stay last.
+  let nextOrder = 101
+  const uploads = new Map()
+  const report = []
+  for (const h of HIDDEN_SERIES) {
+    if (existing.some((e) => e.slug === h.oldSlug)) {
+      report.push({series: h.oldSlug, result: 'SKIPPED, already exists'})
+      continue
+    }
+    const o = ofType(old, 'openWaterRodSeries').find((d) => d.slug?.current === h.oldSlug)
+    if (!o) throw new Error('Old series not found: ' + h.oldSlug)
+    const applications = ofType(old, 'openWaterApplication')
+      .filter((a) => a.series?._ref === o._id)
+      .map((a, i) => {
+        const app = {_type: 'application', _key: `app${String(i + 1).padStart(2, '0')}`}
+        for (const f of ['length', 'powerAction', 'lineWeight', 'lureWeight', 'usage']) {
+          if (a[f] !== undefined && a[f] !== null) app[f] = String(a[f])
+        }
+        app.upcharge = Number(a.upcharge) || 0
+        return app
+      })
+    const doc = {
+      _id: 'rodSeries-' + h.oldSlug,
+      _type: 'rodSeries',
+      name: h.name,
+      slug: h.oldSlug,
+      applicationType: 'open-water',
+      order: nextOrder++,
+      builderStatus: 'hidden',
+      builderBlankColors: [{_type: 'reference', _key: 'black', _ref: blankId('Black')}],
+      applications,
+    }
+    const file = imageFilePath(exportDir, o.mainImage)
+    if (file && fs.existsSync(file) && !dryRun) {
+      if (!uploads.has(file)) {
+        const asset = await client.assets.upload('image', fs.createReadStream(file), {
+          filename: path.basename(file),
+        })
+        uploads.set(file, asset._id)
+      }
+      doc.builderImage = {_type: 'image', asset: {_type: 'reference', _ref: uploads.get(file)}}
+    }
+    if (!dryRun) await client.createIfNotExists(doc)
+    report.push({
+      series: h.oldSlug,
+      id: doc._id,
+      order: doc.order,
+      applications: applications.length,
+      result: dryRun ? 'dry run' : 'created',
+    })
+  }
+  console.log(JSON.stringify(report, null, 2))
+}
+
+// ---------- blurbs (draft card copy for live and coming-soon series; edit in Studio) ----------
+
+const BLURBS = {
+  'hole-hog': 'Highly sensitive tip with a powerful backbone for confident panfish fishing.',
+  'hog-whip':
+    "The Hole Hog's ultra-sensitive tip with a softer backbone, made for finesse presentations to finicky crappies and bluegills.",
+  'panfish-carbon':
+    'A solid carbon blank with a fast taper to a sensitive tip. You feel the bite instead of watching for it.',
+  'eyece-commander':
+    'A solid carbon walleye rod with a big backbone for hauling in large fish and a tip sensitive enough for lighter lures.',
+  'ice-reaper': 'Our next ice rod is on the way. Check back soon.',
+  'bass-spinning':
+    'Lightweight, small-diameter graphite built as a true workhorse for nearly every modern bass technique.',
+  'walleye-spinning': 'Ultra-high modulus graphite with an ultra-fine tip that picks up the subtlest bites.',
+  'panfish-spinning': 'Light and sensitive for panfish jigs, bobbers with live bait and small inline spinners.',
+}
+
+async function blurbs(dryRun) {
+  const client = await getClient()
+  const docs = await client.fetch(
+    `*[_type == "rodSeries" && !(_id in path("drafts.**"))]{_id, slug, builderCardBlurb}`,
+  )
+  for (const [slug, text] of Object.entries(BLURBS)) {
+    const d = docs.find((x) => x.slug === slug)
+    if (!d) {
+      console.log(slug, 'SKIPPED, no doc')
+      continue
+    }
+    if (d.builderCardBlurb) {
+      console.log(slug, 'SKIPPED, already has a blurb')
+      continue
+    }
+    if (!dryRun) await client.patch(d._id).set({builderCardBlurb: text}).commit()
+    console.log(slug, dryRun ? 'dry run' : 'written')
+  }
+}
+
 // ---------- main ----------
 
 const args = parseArgs(process.argv.slice(2))
@@ -475,7 +580,9 @@ const exportDir = findExportDir(args.exportDir)
 if (cmd === 'generate') await generate(exportDir)
 else if (cmd === 'patch-series') await patchSeries(exportDir, args.dryRun)
 else if (cmd === 'pricing') await pricing(exportDir, args.dryRun)
+else if (cmd === 'create-series') await createSeries(exportDir, args.dryRun)
+else if (cmd === 'blurbs') await blurbs(args.dryRun)
 else {
-  console.error('Usage: node scripts/migrate-builder-data.mjs <generate|patch-series|pricing> [--export-dir <dir>] [--dry-run]')
+  console.error('Usage: node scripts/migrate-builder-data.mjs <generate|patch-series|pricing|create-series|blurbs> [--export-dir <dir>] [--dry-run]')
   process.exit(1)
 }
